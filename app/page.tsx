@@ -235,10 +235,12 @@ export default function SpendWiseApp() {
   const handleSendMessage = async () => {
     if (!chatInput.trim()) return
 
+    const currentInput = chatInput
+
     const userMessage: ChatMessage = {
       id: Math.random().toString(36).substr(2, 9),
       role: 'user',
-      content: chatInput,
+      content: currentInput,
       timestamp: new Date().toISOString()
     }
 
@@ -258,7 +260,7 @@ export default function SpendWiseApp() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `User query: "${chatInput}"\n\nExpense data: ${JSON.stringify(expenseData)}`,
+          message: `User query: "${currentInput}"\n\nExpense data: ${JSON.stringify(expenseData)}`,
           agent_id: '693069930683f6b758456d1b'
         })
       })
