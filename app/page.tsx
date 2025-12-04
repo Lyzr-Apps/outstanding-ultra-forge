@@ -168,6 +168,31 @@ export default function SpendWiseApp() {
 
   const recentExpenses = filteredExpenses.slice(0, 5)
 
+  // Generate 30-day spending trend
+  const getLast30DaysTrend = () => {
+    const trendData: { date: string; amount: number }[] = []
+    const today = new Date()
+
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(date.getDate() - i)
+      const dateStr = date.toISOString().split('T')[0]
+
+      const dayTotal = expenses
+        .filter(exp => exp.date === dateStr)
+        .reduce((sum, exp) => sum + exp.amount, 0)
+
+      trendData.push({
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        amount: parseFloat(dayTotal.toFixed(2))
+      })
+    }
+
+    return trendData
+  }
+
+  const trendData = getLast30DaysTrend()
+
   // Form handlers
   const handleAddExpense = () => {
     if (!formData.amount || !formData.category) return
@@ -373,6 +398,36 @@ export default function SpendWiseApp() {
                 </CardContent>
               </Card>
             )}
+
+            {/* 30-Day Spending Trend */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Spending Trend (Last 30 Days)</CardTitle>
+                <CardDescription>Daily spending overview</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" tick={{ fontSize: 12 }} interval={4} />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => `$${value.toFixed(2)}`}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="amount"
+                      stroke="#00d4aa"
+                      strokeWidth={3}
+                      dot={{ fill: '#00d4aa', r: 4 }}
+                      activeDot={{ r: 6 }}
+                      isAnimationActive={true}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
 
             {/* Recent Transactions */}
             <Card>
